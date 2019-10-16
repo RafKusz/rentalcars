@@ -1,0 +1,83 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="1" author="rafal">
+        <createSequence sequenceName="car_seq" incrementBy="20" minValue="10" startValue="10"/>
+        <createTable tableName="car">
+            <column name="id" type="int" defaultValueComputed="nextval('car_seq')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="brand" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="model" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="production_year" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price_of_rent" type="float">
+                <constraints nullable="false"/>
+            </column>
+            <column name="available" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="create_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="rafal">
+        <createSequence sequenceName="user_rental_seq" incrementBy="10" minValue="5" startValue="5"/>
+        <createTable tableName="user_rental">
+            <column name="id" type="int" defaultValueComputed="nextval('user_rental_seq')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="surname" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="create_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="rafal">
+        <createSequence sequenceName="contract_seq" startValue="10" minValue="10" incrementBy="50"/>
+        <createTable tableName="contract">
+            <column name="id" type="int" defaultValueComputed="nextval('contract_seq')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="date_of_rent" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_of_return" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_user" type="int">
+                <constraints foreignKeyName="fk_rent_contract_user" references="user_rental(id)"/>
+            </column>
+            <column name="id_car" type="int">
+                <constraints foreignKeyName="fk_rent_contract_car" references="car(id)"/>
+            </column>
+            <column name="create_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

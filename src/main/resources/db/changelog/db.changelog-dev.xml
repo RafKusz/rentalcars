@@ -1,0 +1,48 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <include file="db.changelog.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="add user data" author="rafal">
+        <insert tableName="user_rental">
+            <column name="id">1</column>
+            <column name="name">Jan</column>
+            <column name="surname">Kowalski</column>
+            <column name="email">kowalski@poczta.pl</column>
+            <column name="description">opis Kowalskiego</column>
+            <column name="create_at" value="now()"/>
+        </insert>
+        <insert tableName="user_rental">
+            <column name="id">2</column>
+            <column name="name">Adam</column>
+            <column name="surname">Nowak</column>
+            <column name="email">nowak@poczta.pl</column>
+            <column name="description">opis Nowaka</column>
+            <column name="create_at" value="now()"/>
+        </insert>
+    </changeSet>
+    <changeSet id="add car data" author="rafal">
+        <insert tableName="car">
+            <column name="id">1</column>
+            <column name="brand">Fiat</column>
+            <column name="model">Multipla</column>
+            <column name="production_year">2010</column>
+            <column name="price_of_rent">10</column>
+            <column name="available">true</column>
+            <column name="description">nikt tego nie chce</column>
+            <column name="create_at" value="now()"/>
+        </insert>
+    </changeSet>
+    <changeSet id="add contract data" author="rafal">
+        <insert tableName="contract">
+            <column name="id">1</column>
+            <column name="id_user">2</column>
+            <column name="id_car">1</column>
+            <column name="date_of_rent" valueDate="2020-11-11"/>
+            <column name="date_of_return" valueDate="2020-12-11"/>
+            <column name="create_at" value="now()"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
