@@ -1,6 +1,7 @@
 package com.rentalcars.car.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,9 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.rentalcars.car.service.CarFixtures.*;
+import static com.rentalcars.car.CarFixtures.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class CarControllerTest {
 
-    public static final String CARS_URL = "/cars";
+    private static final String CARS_URL = "/cars";
 
     @Autowired
     MockMvc mockMvc;
@@ -30,24 +30,28 @@ class CarControllerTest {
     ObjectMapper objectMapper;
 
     @Test
+    @DisplayName("Getting all cars return status 'Ok'")
     void getCarsAndReturnStatusOk() throws Exception {
         mockMvc.perform(get(CARS_URL))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @DisplayName("Getting a car returns status 'Ok'")
     void getCarByExistedIdAndReturnStatusOk() throws Exception {
         mockMvc.perform(get(getCarUrl(EXISTED_ID)))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @DisplayName("Getting a car returns status 'Not Found' if id is not exist")
     void getCarByNotExistedIdAndReturnStatusNotFound() throws Exception {
         mockMvc.perform(get(getCarUrl(NOT_EXISTED_ID)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
+    @DisplayName("Creating a car returns status 'Ok' if it is valid")
     void createCarAndReturnStatusOk() throws Exception {
         mockMvc.perform(post(CARS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -56,6 +60,7 @@ class CarControllerTest {
     }
 
     @Test
+    @DisplayName("Updating a car returns status 'Ok' if it is valid")
     void updateCarWithExistedIdAndReturnStatusOk() throws Exception {
         mockMvc.perform(put(getCarUrl(EXISTED_ID))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -64,6 +69,7 @@ class CarControllerTest {
     }
 
     @Test
+    @DisplayName("Updating a car returns status 'Not Found' if id is not existed")
     void updateCarWithNotExistedIdAndReturnStatusNotFound() throws Exception {
         mockMvc.perform(put(getCarUrl(NOT_EXISTED_ID))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,19 +78,20 @@ class CarControllerTest {
     }
 
     @Test
+    @DisplayName("Deleting a car returns status 'Ok' if it is valid")
     void deleteCarWithExistedIdAndReturnStatusOk() throws Exception {
         mockMvc.perform(delete(getCarUrl(EXISTED_ID)))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @DisplayName("Deleting a car returns status 'Not Found' if id is not existed")
     void deleteCarWithNoExistedIdAndReturnStatusNotFound() throws Exception {
         mockMvc.perform(delete(getCarUrl(NOT_EXISTED_ID)))
                 .andExpect(status().isNotFound());
     }
 
-    String getCarUrl(Long id) {
-        String url = String.format("/cars/%s", id);
-        return url;
+    private String getCarUrl(Long id) {
+        return String.format("/cars/%s", id);
     }
 }

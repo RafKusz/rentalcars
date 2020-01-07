@@ -4,13 +4,14 @@ import com.rentalcars.exceptions.UserNotFoundException;
 import com.rentalcars.user.model.User;
 import com.rentalcars.user.model.UserDto;
 import com.rentalcars.user.repository.UserRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,14 +20,13 @@ import java.util.Optional;
 import static com.rentalcars.user.UserFixtures.*;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 @SpringBootTest
 @Transactional
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(SpringExtension.class)
 public class UserServiceImplTest {
 
     @Mock
@@ -34,22 +34,24 @@ public class UserServiceImplTest {
 
     private UserServiceImpl userService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         userService = new UserServiceImpl(userRepository);
     }
 
     @Test
-    public void returnListOfUsers() throws Exception {
+    @DisplayName("Getting all users return list of users")
+    public void returnListOfUsers() {
         Mockito.when(userRepository.findAll()).thenReturn(singletonList(getUser()));
 
         List<UserDto> userDtoList = userService.getUsers();
 
         assertNotNull(userDtoList);
-        assertEquals(EXPECTED_SIZE, userDtoList.size());
+        assertEquals(1, userDtoList.size());
     }
 
     @Test
+    @DisplayName("Getting a user returns a user if id is exist")
     public void returnUserIfIdIsExisted() throws Exception {
         Mockito.when(userRepository.findById(anyLong())).thenReturn(ofNullable(getUser()));
 
@@ -60,20 +62,17 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void throwExceptionIfUserIdDoesNotExisted() throws Exception {
+    @DisplayName("Getting a user throw exception if id is not exist")
+    public void throwExceptionIfUserIdDoesNotExisted() {
         Mockito.when(userRepository.findById(NOT_EXISTED_ID)).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> userService.getUser(NOT_EXISTED_ID));
     }
 
     @Test
-    public void createNewUserIfItIsValid() throws Exception {
+    @DisplayName("Creating a user creates new user if it is valid")
+    public void createNewUserIfItIsValid() {
         Mockito.when(userRepository.save(any(User.class))).thenAnswer(i -> getUserFromMock((User) i.getArguments()[0]));
-//        Mockito.when(userRepository.save(any(User.class))).thenAnswer(i -> {
-//            User user = (User) i.getArguments()[0];
-//            user.setId(1L);
-//            return user;
-//        });
 
         UserDto userDto = userService.createUser(getUserDto());
 
@@ -92,6 +91,7 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Updating a user update a user if it is valid")
     public void updateUserIfItIsValid() throws Exception {
         Mockito.when(userRepository.findById(EXISTED_ID)).thenReturn(ofNullable(getUser()));
 
@@ -107,12 +107,11 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Deleting a user do not throw exception if a user to delete is valid")
     public void doNotThrowExceptionIfUserToDeleteIsValid() throws Exception {
         Mockito.when(userRepository.findById(EXISTED_ID)).thenReturn(ofNullable(getUser()));
         Mockito.doNothing().when(userRepository).delete(any(User.class));
 
         userService.deleteUser(EXISTED_ID);
     }
-
-
 }

@@ -2,9 +2,9 @@ package com.rentalcars.car.service;
 
 import com.rentalcars.car.model.Car;
 import com.rentalcars.car.model.CarDto;
-import com.rentalcars.car.model.mapper.CarMapper;
 import com.rentalcars.car.repository.CarRepository;
 import com.rentalcars.exceptions.CarNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +14,7 @@ import java.util.List;
 import static com.rentalcars.car.model.mapper.CarMapper.MAPPER;
 
 @Service
+@Slf4j
 public class CarServiceImpl implements CarService {
 
     public static final String CAR_DOES_NOT_EXIST_MESSAGE = "Car does not exist with id: ";
@@ -27,12 +28,14 @@ public class CarServiceImpl implements CarService {
 
     public List<CarDto> getCars() {
         List<Car> cars = carRepository.findAll();
+        log.info("Returned all cars, actual number of car: {}", cars.size());
         return MAPPER.mapToCarDtos(cars);
     }
 
     public CarDto getCar(Long id) throws CarNotFoundException {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new CarNotFoundException(CAR_DOES_NOT_EXIST_MESSAGE + id));
+        log.info("Returned the car with id: {}", car.getId());
         return MAPPER.mapToDto(car);
     }
 
@@ -41,6 +44,7 @@ public class CarServiceImpl implements CarService {
         car.setId(null);
         car.setCreateAt(LocalDateTime.now());
         carRepository.save(car);
+        log.info("The new car was added with id: {}", car.getId());
         return MAPPER.mapToDto(car);
     }
 
@@ -54,11 +58,14 @@ public class CarServiceImpl implements CarService {
         car.setPriceOfRent(carDto.getPriceOfRent());
         car.setDescription(carDto.getDescription());
         carRepository.save(car);
+        log.info("The car with id: {} was updated, new values: {}", id, carDto);
         return MAPPER.mapToDto(car);
     }
 
     public void deleteCar(Long id) throws CarNotFoundException {
-        Car car = carRepository.findById(id).orElseThrow(() -> new CarNotFoundException(CAR_DOES_NOT_EXIST_MESSAGE + id));
+        Car car = carRepository.findById(id).orElseThrow(() ->
+                new CarNotFoundException(CAR_DOES_NOT_EXIST_MESSAGE + id));
         carRepository.delete(car);
+        log.info("The car with id: {} was deleted", id);
     }
 }

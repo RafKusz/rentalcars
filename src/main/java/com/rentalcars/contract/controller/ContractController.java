@@ -1,10 +1,11 @@
 package com.rentalcars.contract.controller;
 
-import com.rentalcars.exceptions.CarNotFoundException;
-import com.rentalcars.exceptions.ContractNotFoundException;
-import com.rentalcars.exceptions.UserNotFoundException;
 import com.rentalcars.contract.model.ContractDto;
 import com.rentalcars.contract.service.ContractService;
+import com.rentalcars.exceptions.CarNotFoundException;
+import com.rentalcars.exceptions.ContractNotFoundException;
+import com.rentalcars.exceptions.ContractUnavailableException;
+import com.rentalcars.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +27,18 @@ public class ContractController {
         return contractService.getAll();
     }
 
+    @GetMapping("/users/{userId}")
+    public List<ContractDto> findAllContractsByUserId(@PathVariable("userId") Long id) throws UserNotFoundException {
+        return contractService.getAllContractsByUser(id);
+    }
+
     @GetMapping("/{rentId}")
     public ContractDto getOneContract(@PathVariable("rentId") Long id) throws ContractNotFoundException {
         return contractService.getContract(id);
     }
 
     @PostMapping
-    public ContractDto createContract(@RequestBody ContractDto contractDto) throws CarNotFoundException, UserNotFoundException {
+    public ContractDto createContract(@RequestBody ContractDto contractDto) throws UserNotFoundException, CarNotFoundException, ContractUnavailableException {
         return contractService.createContract(contractDto);
     }
 
