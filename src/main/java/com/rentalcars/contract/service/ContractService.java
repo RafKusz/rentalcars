@@ -1,6 +1,7 @@
 package com.rentalcars.contract.service;
 
 import com.rentalcars.contract.model.ContractDto;
+import com.rentalcars.contract.model.ContractInput;
 import com.rentalcars.exceptions.CarNotFoundException;
 import com.rentalcars.exceptions.ContractNotFoundException;
 import com.rentalcars.exceptions.ContractUnavailableException;
@@ -16,8 +17,7 @@ public interface ContractService {
 
     ContractDto getContract(Long id) throws ContractNotFoundException;
 
-    ContractDto createContract(ContractDto contractDto) throws UserNotFoundException, CarNotFoundException, ContractUnavailableException;
+    ContractDto createContract(ContractInput contractInput) throws UserNotFoundException, CarNotFoundException, ContractUnavailableException;
 
     void deleteContract(Long id) throws ContractNotFoundException;
-
 }

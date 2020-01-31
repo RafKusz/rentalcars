@@ -55,18 +55,18 @@ public class UserServiceImplTest {
     public void returnUserIfIdIsExisted() throws Exception {
         Mockito.when(userRepository.findById(anyLong())).thenReturn(ofNullable(getUser()));
 
-        UserDto userDto = userService.getUser(EXISTED_ID);
+        UserDto userDto = userService.getUser(EXISTED_USER_ID);
 
         assertNotNull(userDto);
-        assertEquals(EXISTED_ID, userDto.getId());
+        assertEquals(EXISTED_USER_ID, userDto.getId());
     }
 
     @Test
     @DisplayName("Getting a user throw exception if id is not exist")
     public void throwExceptionIfUserIdDoesNotExisted() {
-        Mockito.when(userRepository.findById(NOT_EXISTED_ID)).thenReturn(Optional.empty());
+        Mockito.when(userRepository.findById(NOT_EXISTED_USER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.getUser(NOT_EXISTED_ID));
+        assertThrows(UserNotFoundException.class, () -> userService.getUser(NOT_EXISTED_USER_ID));
     }
 
     @Test
@@ -93,9 +93,9 @@ public class UserServiceImplTest {
     @Test
     @DisplayName("Updating a user update a user if it is valid")
     public void updateUserIfItIsValid() throws Exception {
-        Mockito.when(userRepository.findById(EXISTED_ID)).thenReturn(ofNullable(getUser()));
+        Mockito.when(userRepository.findById(EXISTED_USER_ID)).thenReturn(ofNullable(getUser()));
 
-        UserDto userDto = userService.updateUser(getUpdateUserDto(), EXISTED_ID);
+        UserDto userDto = userService.updateUser(getUpdateUserDto(), EXISTED_USER_ID);
 
         assertNotNull(userDto);
         assertNotNull(userDto.getId());
@@ -109,9 +109,9 @@ public class UserServiceImplTest {
     @Test
     @DisplayName("Deleting a user do not throw exception if a user to delete is valid")
     public void doNotThrowExceptionIfUserToDeleteIsValid() throws Exception {
-        Mockito.when(userRepository.findById(EXISTED_ID)).thenReturn(ofNullable(getUser()));
+        Mockito.when(userRepository.findById(EXISTED_USER_ID)).thenReturn(ofNullable(getUser()));
         Mockito.doNothing().when(userRepository).delete(any(User.class));
 
-        userService.deleteUser(EXISTED_ID);
+        userService.deleteUser(EXISTED_USER_ID);
     }
 }

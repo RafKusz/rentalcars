@@ -2,12 +2,14 @@ package com.rentalcars.car.service;
 
 import com.rentalcars.car.model.Car;
 import com.rentalcars.car.model.CarDto;
+import com.rentalcars.car.model.CarOutput;
 import com.rentalcars.car.repository.CarRepository;
 import com.rentalcars.exceptions.CarNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,6 +34,12 @@ public class CarServiceImpl implements CarService {
         return MAPPER.mapToCarDtos(cars);
     }
 
+    public List<CarOutput> getAvailableCarsByRangeOfDates(LocalDate startDate, LocalDate finishDate) {
+        List<Car> cars = carRepository.findAvailableCarsByDate(startDate, finishDate);
+        log.info("Returned all available cars, actual number of car: {}", cars.size());
+        return MAPPER.mapToCarOutputs(cars);
+    }
+
     public CarDto getCar(Long id) throws CarNotFoundException {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new CarNotFoundException(CAR_DOES_NOT_EXIST_MESSAGE + id));
@@ -54,7 +62,6 @@ public class CarServiceImpl implements CarService {
         car.setBrand(carDto.getBrand());
         car.setModel(carDto.getModel());
         car.setProductionYear(carDto.getProductionYear());
-        car.setAvailable(carDto.getAvailable());
         car.setPriceOfRent(carDto.getPriceOfRent());
         car.setDescription(carDto.getDescription());
         carRepository.save(car);

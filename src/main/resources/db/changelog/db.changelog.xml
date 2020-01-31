@@ -20,9 +20,6 @@
             <column name="price_of_rent" type="float">
                 <constraints nullable="false"/>
             </column>
-            <column name="available" type="boolean">
-                <constraints nullable="false"/>
-            </column>
             <column name="description" type="varchar(500)">
                 <constraints nullable="true"/>
             </column>

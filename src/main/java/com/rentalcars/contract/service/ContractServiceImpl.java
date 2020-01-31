@@ -4,6 +4,7 @@ import com.rentalcars.car.model.Car;
 import com.rentalcars.car.repository.CarRepository;
 import com.rentalcars.contract.model.Contract;
 import com.rentalcars.contract.model.ContractDto;
+import com.rentalcars.contract.model.ContractInput;
 import com.rentalcars.contract.repository.ContractRepository;
 import com.rentalcars.exceptions.CarNotFoundException;
 import com.rentalcars.exceptions.ContractNotFoundException;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.rentalcars.car.service.CarServiceImpl.CAR_DOES_NOT_EXIST_MESSAGE;
+import static com.rentalcars.contract.model.mapper.ContractInputMapper.CONTRACT_INPUT_MAPPER;
 import static com.rentalcars.contract.model.mapper.ContractMapper.CONTRACT_MAPPER;
 import static com.rentalcars.user.service.UserServiceImpl.USER_DOES_NOT_EXIST_MESSAGE;
 
@@ -66,15 +68,15 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    public ContractDto createContract(ContractDto contractDto) throws UserNotFoundException, CarNotFoundException, ContractUnavailableException {
-        Long userId = contractDto.getUserDto().getId();
-        Long carId = contractDto.getCarDto().getId();
-        checkIfDatesAreAvailable(contractDto.getDateOfRent(), contractDto.getDateOfReturn(), carId);
-        Contract contractEntity = CONTRACT_MAPPER.mapToContractEntity(contractDto);
+    public ContractDto createContract(ContractInput contractInput) throws UserNotFoundException, CarNotFoundException, ContractUnavailableException {
+        checkIfDatesAreAvailable(contractInput.getDateOfRent(), contractInput.getDateOfReturn(), contractInput.getCarId());
+
+        Contract contractEntity = CONTRACT_INPUT_MAPPER.mapToContractEntity(contractInput);
         contractEntity.setId(null);
-        contractEntity.setUser(getUser(userId));
-        contractEntity.setCar(getCar(carId));
+        contractEntity.setUser(getUser(contractInput.getUserId()));
+        contractEntity.setCar(getCar(contractInput.getCarId()));
         contractEntity.setCreateAt(LocalDateTime.now());
+
         contractRepository.save(contractEntity);
         log.info("The new contract was added with id: {}", contractEntity.getId());
         return CONTRACT_MAPPER.mapToContractDto(contractEntity);

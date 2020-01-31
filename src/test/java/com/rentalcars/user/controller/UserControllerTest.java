@@ -39,14 +39,14 @@ class UserControllerTest {
     @Test
     @DisplayName("Getting a user returns status 'Ok'")
     void getUserByExistedIdAndReturnStatusOk() throws Exception {
-        mockMvc.perform(get(getUserUrl(EXISTED_ID)))
+        mockMvc.perform(get(getUserUrl(EXISTED_USER_ID)))
                 .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Getting a user returns status 'Not Found' if id is not exist")
     void getUserByNotExistedIdAndReturnStatusNotFound() throws Exception {
-        mockMvc.perform(get(getUserUrl(NOT_EXISTED_ID)))
+        mockMvc.perform(get(getUserUrl(NOT_EXISTED_USER_ID)))
                 .andExpect(status().isNotFound());
     }
 
@@ -62,7 +62,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Updating a user returns status 'Ok' if it is valid")
     void updateUserByExistedIdAndReturnStatusOk() throws Exception {
-        mockMvc.perform(put(getUserUrl(EXISTED_ID))
+        mockMvc.perform(put(getUserUrl(EXISTED_USER_ID))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(getUserDto())))
                 .andExpect(status().isOk());
@@ -71,7 +71,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Updating a user returns status 'Not Found' if id is not existed")
     void updateUserByNotExistedIdAndReturnStatusNotFound() throws Exception {
-        mockMvc.perform(put(getUserUrl(NOT_EXISTED_ID))
+        mockMvc.perform(put(getUserUrl(NOT_EXISTED_USER_ID))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(getUserDto())))
                 .andExpect(status().isNotFound());
@@ -80,14 +80,14 @@ class UserControllerTest {
     @Test
     @DisplayName("Deleting a user returns status 'Ok' if it is valid")
     void deleteUserAndReturnStatusOk() throws Exception {
-        mockMvc.perform(delete(getUserUrl(EXISTED_ID)))
+        mockMvc.perform(delete(getUserUrl(EXISTED_USER_ID)))
                 .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Deleting a user returns status 'Not Found' if id is not existed")
     void deleteUserByNotExistedIdAndReturnStatusNotFound() throws Exception {
-        mockMvc.perform(delete(getUserUrl(NOT_EXISTED_ID)))
+        mockMvc.perform(delete(getUserUrl(NOT_EXISTED_USER_ID)))
                 .andExpect(status().isNotFound());
     }
 

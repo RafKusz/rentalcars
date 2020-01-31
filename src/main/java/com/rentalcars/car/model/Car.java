@@ -1,10 +1,16 @@
 package com.rentalcars.car.model;
 
 import com.rentalcars.contract.model.Contract;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,9 +42,6 @@ public class Car {
     @NotNull
     @Min(0)
     private Double priceOfRent;
-
-    @NotNull
-    private Boolean available;
 
     @Size(max = 500)
     private String description;

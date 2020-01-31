@@ -1,8 +1,7 @@
 package com.rentalcars.contract.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rentalcars.contract.model.ContractDto;
-import com.rentalcars.user.UserFixtures;
+import com.rentalcars.contract.model.ContractInput;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import static com.rentalcars.car.CarFixtures.NOT_EXISTED_CAR_ID;
 import static com.rentalcars.contract.ContractFixtures.*;
 import static com.rentalcars.user.UserFixtures.EXISTED_USER_ID_WITH_CONTRACT;
+import static com.rentalcars.user.UserFixtures.NOT_EXISTED_USER_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,7 +45,7 @@ class ContractControllerTest {
     @Test
     @DisplayName("Getting a contract returns status 'Ok'")
     void getContractByExistedIdAndReturnStatusOk() throws Exception {
-        mockMvc.perform(get(getContractUrl(EXISTED_ID)))
+        mockMvc.perform(get(getContractUrl(EXISTED_CONTRACT_ID)))
                 .andExpect(status().isOk());
     }
 
@@ -58,14 +59,14 @@ class ContractControllerTest {
     @Test
     @DisplayName("Getting a contract returns status 'Not Found' if user do not exist")
     void getContractsByNotExistedUserIdAndReturnStatusNotFound() throws Exception {
-        mockMvc.perform(get(getContractsUrlByUserId(UserFixtures.NOT_EXISTED_ID)))
+        mockMvc.perform(get(getContractsUrlByUserId(NOT_EXISTED_USER_ID)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @DisplayName("Getting a contract returns status 'Not Found' if id is not exist")
     void getContractByNotExitedIdAndReturnStatusNotFound() throws Exception {
-        mockMvc.perform(get(getContractUrl(NOT_EXISTED_ID)))
+        mockMvc.perform(get(getContractUrl(NOT_EXISTED_CONTRACT_ID)))
                 .andExpect(status().isNotFound());
     }
 
@@ -74,7 +75,7 @@ class ContractControllerTest {
     void createContractAndReturnStatusOk() throws Exception {
         mockMvc.perform(post(CONTRACTS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(getRentContractDto())))
+                .content(objectMapper.writeValueAsBytes(getRentContractInput())))
                 .andExpect(status().isOk());
     }
 
@@ -83,7 +84,7 @@ class ContractControllerTest {
     void createContractOnUnavailableRangeOfDatesAndReturnStatusConflict() throws Exception {
         mockMvc.perform(post(CONTRACTS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(getContractDtoWithUnavailableRangeOfDates())))
+                .content(objectMapper.writeValueAsBytes(getContractInputWithUnavailableRangeOfDates())))
                 .andExpect(status().isConflict());
     }
 
@@ -92,7 +93,7 @@ class ContractControllerTest {
     void createContractWithNotExistedUserReturnStatusNotFound() throws Exception {
         mockMvc.perform(post(CONTRACTS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(getContractDtoWithNotExistedUser())))
+                .content(objectMapper.writeValueAsBytes(getContractInputWithNotExistedUser())))
                 .andExpect(status().isNotFound());
     }
 
@@ -101,21 +102,21 @@ class ContractControllerTest {
     void createContractWithNotExistedCarReturnStatusNotFound() throws Exception {
         mockMvc.perform(post(CONTRACTS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(getContractDtoWithNotExistedCar())))
+                .content(objectMapper.writeValueAsBytes(getContractInputWithNotExistedCar())))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @DisplayName("Deleting a contract returns status 'Ok' if it is valid")
     void deleteContractByExistedIdAndReturnStatusOk() throws Exception {
-        mockMvc.perform(delete(getContractUrl(EXISTED_ID)))
+        mockMvc.perform(delete(getContractUrl(EXISTED_CONTRACT_ID)))
                 .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Deleting a contract returns status 'Not Found' if id is not existed")
     void deleteContractByNotExistedIdAndReturnStatusNotFound() throws Exception {
-        mockMvc.perform(delete(getContractUrl(NOT_EXISTED_ID)))
+        mockMvc.perform(delete(getContractUrl(NOT_EXISTED_CONTRACT_ID)))
                 .andExpect(status().isNotFound());
     }
 
@@ -127,22 +128,22 @@ class ContractControllerTest {
         return "/contracts/users/" + userId;
     }
 
-    private ContractDto getContractDtoWithUnavailableRangeOfDates() {
-        ContractDto contractDto = getRentContractDto();
-        contractDto.setDateOfRent(LocalDate.of(2020, 11, 11));
-        contractDto.setDateOfReturn(LocalDate.of(2020, 12, 11));
-        return contractDto;
+    private ContractInput getContractInputWithUnavailableRangeOfDates() {
+        ContractInput contractInput = getRentContractInput();
+        contractInput.setDateOfRent(LocalDate.of(2020, 11, 11));
+        contractInput.setDateOfReturn(LocalDate.of(2020, 12, 11));
+        return contractInput;
     }
 
-    private ContractDto getContractDtoWithNotExistedUser() {
-        ContractDto contractDto = getRentContractDto();
-        contractDto.getUserDto().setId(NOT_EXISTED_ID);
-        return contractDto;
+    private ContractInput getContractInputWithNotExistedUser() {
+        ContractInput contractInput = getRentContractInput();
+        contractInput.setUserId(NOT_EXISTED_USER_ID);
+        return contractInput;
     }
 
-    private ContractDto getContractDtoWithNotExistedCar() {
-        ContractDto contractDto = getRentContractDto();
-        contractDto.getCarDto().setId(NOT_EXISTED_ID);
-        return contractDto;
+    private ContractInput getContractInputWithNotExistedCar() {
+        ContractInput contractInput = getRentContractInput();
+        contractInput.setCarId(NOT_EXISTED_CAR_ID);
+        return contractInput;
     }
 }

@@ -1,6 +1,7 @@
 package com.rentalcars.contract.controller;
 
 import com.rentalcars.contract.model.ContractDto;
+import com.rentalcars.contract.model.ContractInput;
 import com.rentalcars.contract.service.ContractService;
 import com.rentalcars.exceptions.CarNotFoundException;
 import com.rentalcars.exceptions.ContractNotFoundException;
@@ -9,6 +10,7 @@ import com.rentalcars.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -33,13 +35,13 @@ public class ContractController {
     }
 
     @GetMapping("/{rentId}")
-    public ContractDto getOneContract(@PathVariable("rentId") Long id) throws ContractNotFoundException {
+    public ContractDto getContract(@PathVariable("rentId") Long id) throws ContractNotFoundException {
         return contractService.getContract(id);
     }
 
     @PostMapping
-    public ContractDto createContract(@RequestBody ContractDto contractDto) throws UserNotFoundException, CarNotFoundException, ContractUnavailableException {
-        return contractService.createContract(contractDto);
+    public ContractDto createContract(@Valid @RequestBody ContractInput contractInput) throws UserNotFoundException, CarNotFoundException, ContractUnavailableException {
+        return contractService.createContract(contractInput);
     }
 
     @DeleteMapping("/{rentId}")

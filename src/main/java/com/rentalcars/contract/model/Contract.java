@@ -1,6 +1,5 @@
 package com.rentalcars.contract.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.rentalcars.car.model.Car;
 import com.rentalcars.user.model.User;
 import lombok.AllArgsConstructor;
@@ -40,12 +39,10 @@ public class Contract {
 
     @NotNull
     @FutureOrPresent
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateOfRent;
 
     @NotNull
     @FutureOrPresent
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateOfReturn;
 
     @NotNull

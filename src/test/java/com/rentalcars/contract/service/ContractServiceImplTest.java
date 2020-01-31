@@ -26,8 +26,6 @@ import java.util.Optional;
 
 import static com.rentalcars.car.CarFixtures.getCar;
 import static com.rentalcars.car.CarFixtures.getCarDto;
-import static com.rentalcars.contract.ContractFixtures.EXISTED_ID;
-import static com.rentalcars.contract.ContractFixtures.NOT_EXISTED_ID;
 import static com.rentalcars.contract.ContractFixtures.*;
 import static com.rentalcars.user.UserFixtures.*;
 import static java.util.Collections.emptyList;
@@ -84,9 +82,9 @@ public class ContractServiceImplTest {
     @Test
     @DisplayName("Getting all contracts by user id throw exception if user id does not exist")
     public void throwExceptionIfUserDoesNotExists() {
-        Mockito.when(userRepository.existsById(UserFixtures.NOT_EXISTED_ID)).thenReturn(false);
+        Mockito.when(userRepository.existsById(UserFixtures.NOT_EXISTED_USER_ID)).thenReturn(false);
 
-        assertThrows(UserNotFoundException.class, () -> contractService.getAllContractsByUser(UserFixtures.NOT_EXISTED_ID));
+        assertThrows(UserNotFoundException.class, () -> contractService.getAllContractsByUser(UserFixtures.NOT_EXISTED_USER_ID));
     }
 
     @Test
@@ -94,7 +92,7 @@ public class ContractServiceImplTest {
     public void returnContractIfIdIsExisted() throws Exception {
         Mockito.when(contractRepository.findById(anyLong())).thenReturn(ofNullable(getRentContract()));
 
-        ContractDto contractDto = contractService.getContract(EXISTED_ID);
+        ContractDto contractDto = contractService.getContract(EXISTED_CONTRACT_ID);
 
         assertNotNull(contractDto);
         assertNotNull(contractDto.getId());
@@ -109,7 +107,7 @@ public class ContractServiceImplTest {
     public void throwExceptionIfIdIsNotExisted() {
         Mockito.when(contractRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(ContractNotFoundException.class, () -> contractService.getContract(NOT_EXISTED_ID));
+        assertThrows(ContractNotFoundException.class, () -> contractService.getContract(NOT_EXISTED_CONTRACT_ID));
     }
 
     @Test
@@ -120,7 +118,7 @@ public class ContractServiceImplTest {
         Mockito.when(contractRepository.findContractsFromPeriodAndCarId(any(LocalDate.class), any(LocalDate.class), anyLong())).thenReturn(emptyList());
         Mockito.when(contractRepository.save(any(Contract.class))).thenAnswer(i -> getContractFromTheMock((Contract) i.getArguments()[0]));
 
-        ContractDto contractDto = contractService.createContract(getRentContractDto());
+        ContractDto contractDto = contractService.createContract(getRentContractInput());
 
         assertNotNull(contractDto);
         assertNotNull(contractDto.getId());
@@ -144,7 +142,7 @@ public class ContractServiceImplTest {
         Mockito.when(contractRepository.findContractsFromPeriodAndCarId(any(LocalDate.class), any(LocalDate.class), anyLong()))
                 .thenReturn(Collections.singletonList(getRentContract()));
 
-        assertThrows(ContractUnavailableException.class, () -> contractService.createContract(getRentContractDto()));
+        assertThrows(ContractUnavailableException.class, () -> contractService.createContract(getRentContractInput()));
     }
 
     @Test
@@ -153,6 +151,6 @@ public class ContractServiceImplTest {
         Mockito.when(contractRepository.findById(anyLong())).thenReturn(ofNullable(getRentContract()));
         Mockito.doNothing().when(contractRepository).delete(any(Contract.class));
 
-        contractService.deleteContract(EXISTED_ID);
+        contractService.deleteContract(EXISTED_CONTRACT_ID);
     }
 }

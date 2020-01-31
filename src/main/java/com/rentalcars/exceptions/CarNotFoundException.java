@@ -16,5 +16,4 @@ public class CarNotFoundException extends Exception {
         super(message);
         log.info(message);
     }
-
 }

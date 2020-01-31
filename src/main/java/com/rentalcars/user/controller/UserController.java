@@ -6,6 +6,7 @@ import com.rentalcars.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -30,12 +31,12 @@ public class UserController {
     }
 
     @PostMapping()
-    public UserDto createUser(@RequestBody UserDto userDto) {
+    public UserDto createUser(@Valid @RequestBody UserDto userDto) {
         return userService.createUser(userDto);
     }
 
     @PutMapping("/{userId}")
-    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable("userId") Long id) throws UserNotFoundException {
+    public UserDto updateUser(@Valid @RequestBody UserDto userDto, @PathVariable("userId") Long id) throws UserNotFoundException {
         return userService.updateUser(userDto, id);
     }
 

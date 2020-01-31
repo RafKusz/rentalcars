@@ -30,10 +30,19 @@
             <column name="model">Multipla</column>
             <column name="production_year">2010</column>
             <column name="price_of_rent">10</column>
-            <column name="available">true</column>
             <column name="description">nikt tego nie chce</column>
             <column name="create_at" value="now()"/>
         </insert>
+        <insert tableName="car">
+            <column name="id">2</column>
+            <column name="brand">Ford</column>
+            <column name="model">Focus</column>
+            <column name="production_year">2015</column>
+            <column name="price_of_rent">20</column>
+            <column name="description">uszkodzone gniazdko zapalniczki</column>
+            <column name="create_at" value="now()"/>
+        </insert>
+
     </changeSet>
     <changeSet id="add contract data" author="rafal">
         <insert tableName="contract">

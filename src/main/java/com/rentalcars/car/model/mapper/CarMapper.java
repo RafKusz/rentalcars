@@ -2,6 +2,7 @@ package com.rentalcars.car.model.mapper;
 
 import com.rentalcars.car.model.Car;
 import com.rentalcars.car.model.CarDto;
+import com.rentalcars.car.model.CarOutput;
 import com.rentalcars.contract.model.mapper.ContractMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,7 +21,7 @@ public interface CarMapper {
     @Mapping(source = "contracts", target = "contractDtos")
     CarDto mapToDto(Car car);
 
-    List<Car> mapToCars(List<CarDto> carDtos);
+    List<CarOutput> mapToCarOutputs(List<Car> cars);
 
     List<CarDto> mapToCarDtos(List<Car> cars);
 }
