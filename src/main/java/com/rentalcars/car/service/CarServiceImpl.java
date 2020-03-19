@@ -5,6 +5,7 @@ import com.rentalcars.car.model.CarDto;
 import com.rentalcars.car.model.CarOutput;
 import com.rentalcars.car.repository.CarRepository;
 import com.rentalcars.exceptions.CarNotFoundException;
+import com.rentalcars.exceptions.UnavailableRangeOfDatesException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import static com.rentalcars.car.model.mapper.CarMapper.MAPPER;
 public class CarServiceImpl implements CarService {
 
     public static final String CAR_DOES_NOT_EXIST_MESSAGE = "Car does not exist with id: ";
+    private static final String UNAVAILABLE_RANGE_OF_DATES_MESSAGE = "Finish date must be after than start date";
 
     private CarRepository carRepository;
 
@@ -28,25 +30,31 @@ public class CarServiceImpl implements CarService {
         this.carRepository = carRepository;
     }
 
+    @Override
     public List<CarDto> getCars() {
         List<Car> cars = carRepository.findAll();
         log.info("Returned all cars, actual number of car: {}", cars.size());
         return MAPPER.mapToCarDtos(cars);
     }
 
-    public List<CarOutput> getAvailableCarsByRangeOfDates(LocalDate startDate, LocalDate finishDate) {
+    @Override
+    public List<CarOutput> getAvailableCarsByRangeOfDates(LocalDate startDate, LocalDate finishDate) throws UnavailableRangeOfDatesException {
+        if (startDate.isAfter(finishDate)) {
+            throw new UnavailableRangeOfDatesException(UNAVAILABLE_RANGE_OF_DATES_MESSAGE);
+        }
         List<Car> cars = carRepository.findAvailableCarsByDate(startDate, finishDate);
         log.info("Returned all available cars, actual number of car: {}", cars.size());
         return MAPPER.mapToCarOutputs(cars);
     }
 
-    public CarDto getCar(Long id) throws CarNotFoundException {
-        Car car = carRepository.findById(id)
-                .orElseThrow(() -> new CarNotFoundException(CAR_DOES_NOT_EXIST_MESSAGE + id));
+    @Override
+    public CarOutput getCar(Long id) throws CarNotFoundException {
+        Car car = findCarById(id);
         log.info("Returned the car with id: {}", car.getId());
-        return MAPPER.mapToDto(car);
+        return MAPPER.mapToCarOutput(car);
     }
 
+    @Override
     public CarDto createCar(CarDto carDto) {
         Car car = MAPPER.mapToCar(carDto);
         car.setId(null);
@@ -56,9 +64,9 @@ public class CarServiceImpl implements CarService {
         return MAPPER.mapToDto(car);
     }
 
+    @Override
     public CarDto updateCar(CarDto carDto, Long id) throws CarNotFoundException {
-        Car car = carRepository.findById(id)
-                .orElseThrow(() -> new CarNotFoundException(CAR_DOES_NOT_EXIST_MESSAGE + id));
+        Car car = findCarById(id);
         car.setBrand(carDto.getBrand());
         car.setModel(carDto.getModel());
         car.setProductionYear(carDto.getProductionYear());
@@ -69,10 +77,15 @@ public class CarServiceImpl implements CarService {
         return MAPPER.mapToDto(car);
     }
 
+    @Override
     public void deleteCar(Long id) throws CarNotFoundException {
-        Car car = carRepository.findById(id).orElseThrow(() ->
-                new CarNotFoundException(CAR_DOES_NOT_EXIST_MESSAGE + id));
+        Car car = findCarById(id);
         carRepository.delete(car);
         log.info("The car with id: {} was deleted", id);
+    }
+
+    private Car findCarById(Long id) throws CarNotFoundException {
+        return carRepository.findById(id).orElseThrow(() ->
+                new CarNotFoundException(CAR_DOES_NOT_EXIST_MESSAGE + id));
     }
 }

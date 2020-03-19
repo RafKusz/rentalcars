@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 @Data
 @Builder
 public class CarOutput {
+
     private Long id;
 
     @NotBlank

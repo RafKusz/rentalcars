@@ -26,8 +26,8 @@ public interface ContractMapper {
     @Mappings({
             @Mapping(source = "car", target = "carDto"),
             @Mapping(target = "carDto.contractDtos", ignore = true),
-            @Mapping(source = "user", target = "userDto")})
-            @Mapping(target = "userDto.contractDtos", ignore = true)
+            @Mapping(source = "user", target = "userDto"),
+            @Mapping(target = "userDto.contractDtos", ignore = true)})
     ContractDto mapToContractDto(Contract contractEntity);
 
     List<Contract> mapToContracts(List<ContractDto> contractDtos);

@@ -21,4 +21,13 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     List<Contract> findContractsFromPeriodAndCarId(@Param("startRent") LocalDate startRent,
                                                    @Param("finishRent") LocalDate finishRent,
                                                    @Param("carId") Long carId);
+
+    @Query("SELECT c FROM Contract c WHERE c.dateOfRent > now()" +
+            "ORDER BY c.dateOfRent ASC")
+    List<Contract> findAllFutureContracts();
+
+    @Query("SELECT c FROM Contract c WHERE c.dateOfRent > now() " +
+            "AND c.user.id = :userId " +
+            "ORDER BY c.dateOfRent ASC")
+    List<Contract> findAllFutureContractsByUserId(@Param("userId") Long userId);
 }

@@ -7,7 +7,9 @@ import com.rentalcars.contract.repository.ContractRepository;
 import com.rentalcars.exceptions.ContractNotFoundException;
 import com.rentalcars.exceptions.ContractUnavailableException;
 import com.rentalcars.exceptions.UserNotFoundException;
+import com.rentalcars.security.service.SecurityService;
 import com.rentalcars.user.UserFixtures;
+import com.rentalcars.user.model.User;
 import com.rentalcars.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,9 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -35,8 +35,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
-@SpringBootTest
-@Transactional
 @ExtendWith(SpringExtension.class)
 public class ContractServiceImplTest {
 
@@ -49,11 +47,15 @@ public class ContractServiceImplTest {
     @Mock
     private CarRepository carRepository;
 
+    @Mock
+    private SecurityService securityService;
+
     private ContractServiceImpl contractService;
+
 
     @BeforeEach
     public void setUp() {
-        contractService = new ContractServiceImpl(contractRepository, carRepository, userRepository);
+        contractService = new ContractServiceImpl(contractRepository, carRepository, userRepository, securityService);
     }
 
     @Test
@@ -80,6 +82,19 @@ public class ContractServiceImplTest {
     }
 
     @Test
+    @DisplayName("Getting all contracts by logged-in user return list of contracts")
+    public void returnContractListByLoggedInUser() throws Exception {
+        Mockito.when(securityService.getLoggedInUser()).thenReturn(getUser());
+        Mockito.when(contractRepository.findAllByUserId(anyLong())).thenReturn(singletonList(getRentContract()));
+
+        List<ContractDto> dtoList = contractService.getAllContractsByLoggedInUser();
+
+        assertNotNull(dtoList);
+        assertEquals(1, dtoList.size());
+        assertEquals(EXISTED_USER_ID, dtoList.get(0).getUserDto().getId());
+    }
+
+    @Test
     @DisplayName("Getting all contracts by user id throw exception if user id does not exist")
     public void throwExceptionIfUserDoesNotExists() {
         Mockito.when(userRepository.existsById(UserFixtures.NOT_EXISTED_USER_ID)).thenReturn(false);
@@ -96,8 +111,8 @@ public class ContractServiceImplTest {
 
         assertNotNull(contractDto);
         assertNotNull(contractDto.getId());
-        assertEquals(getCarDto(), contractDto.getCarDto());
-        assertEquals(getUserDto(), contractDto.getUserDto());
+        assertEquals(getCarDto().getId(), contractDto.getCarDto().getId());
+        assertEquals(getUserDto().getId(), contractDto.getUserDto().getId());
         assertEquals(DATE_OF_RENT, contractDto.getDateOfRent());
         assertEquals(DATE_OF_RETURN, contractDto.getDateOfReturn());
     }
@@ -111,33 +126,80 @@ public class ContractServiceImplTest {
     }
 
     @Test
-    @DisplayName("Creating a contract creates new contract if it is valid")
+    @DisplayName("Getting future contracts return list of future contracts")
+    public void returnListOfFutureContracts() {
+        Mockito.when(contractRepository.findAllFutureContracts()).thenReturn(singletonList(getRentContract()));
+
+        List<ContractDto> dtoList = contractService.getFutureContracts();
+
+        assertNotNull(dtoList);
+        assertEquals(1, dtoList.size());
+    }
+
+    @Test
+    @DisplayName("Getting future contracts by logged-in user return list of future contracts")
+    public void returnListOfFutureContractsByLoggedInUser() {
+        Mockito.when(contractRepository.findAllFutureContracts()).thenReturn(singletonList(getRentContract()));
+
+        List<ContractDto> dtoList = contractService.getFutureContracts();
+
+        assertNotNull(dtoList);
+        assertEquals(1, dtoList.size());
+    }
+
+    @Test
+    @DisplayName("Getting a contract by logged-in user returns a contract if id is exist")
+    public void returnContractByLoggedInUserIfIdIsExisted() throws Exception {
+        Mockito.when(securityService.getLoggedInUser()).thenReturn(getUser());
+        Mockito.when(contractRepository.findById(anyLong())).thenReturn(ofNullable(getRentContract()));
+
+        ContractDto contractDto = contractService.getContract(EXISTED_CONTRACT_ID);
+
+        assertNotNull(contractDto);
+        assertNotNull(contractDto.getId());
+        assertEquals(EXISTED_USER_ID, contractDto.getUserDto().getId());
+        assertEquals(getCarDto(), contractDto.getCarDto());
+        assertEquals(DATE_OF_RENT, contractDto.getDateOfRent());
+        assertEquals(DATE_OF_RETURN, contractDto.getDateOfReturn());
+    }
+
+    @Test
+    @DisplayName("Getting a contract by logged-in user throw exception if id is not exist")
+    public void throwExceptionIfContractIdIsNotExisted() throws UserNotFoundException {
+        Mockito.when(securityService.getLoggedInUser()).thenReturn(getUser());
+        Mockito.when(contractRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(ContractNotFoundException.class, () -> contractService.getMyContract(NOT_EXISTED_CONTRACT_ID));
+    }
+
+    @Test
+    @DisplayName("Creating a contract by logged-in user creates new contract if it is valid")
     public void createContractIfItIsValid() throws Exception {
-        Mockito.when(userRepository.findById(anyLong())).thenReturn(ofNullable(getUser()));
+        Mockito.when(securityService.getLoggedInUser()).thenReturn(getUser());
         Mockito.when(carRepository.findById(anyLong())).thenReturn(ofNullable(getCar()));
         Mockito.when(contractRepository.findContractsFromPeriodAndCarId(any(LocalDate.class), any(LocalDate.class), anyLong())).thenReturn(emptyList());
-        Mockito.when(contractRepository.save(any(Contract.class))).thenAnswer(i -> getContractFromTheMock((Contract) i.getArguments()[0]));
+        Mockito.when(contractRepository.save(any(Contract.class))).thenAnswer(i -> getContractFromMock((Contract) i.getArguments()[0]));
 
         ContractDto contractDto = contractService.createContract(getRentContractInput());
 
         assertNotNull(contractDto);
         assertNotNull(contractDto.getId());
         assertNotNull(contractDto.getCreateAt());
+        assertEquals(EXISTED_USER_ID, contractDto.getUserDto().getId());
         assertEquals(getCarDto(), contractDto.getCarDto());
-        assertEquals(getUserDto(), contractDto.getUserDto());
         assertEquals(DATE_OF_RENT, contractDto.getDateOfRent());
         assertEquals(DATE_OF_RETURN, contractDto.getDateOfReturn());
     }
 
-    Object getContractFromTheMock(Contract contract) {
+    Object getContractFromMock(Contract contract) {
         contract.setId(1L);
         return contract;
     }
 
     @Test
     @DisplayName("Creating a contract with the same range of dates like existing contract, throw exception")
-    public void throwExceptionIfNewContractHasRangeOfDatesLikeExistingContract() {
-        Mockito.when(userRepository.findById(anyLong())).thenReturn(ofNullable(getUser()));
+    public void throwExceptionIfNewContractHasRangeOfDatesLikeExistingContract() throws UserNotFoundException {
+        Mockito.when(securityService.getLoggedInUser()).thenReturn(getUser());
         Mockito.when(carRepository.findById(anyLong())).thenReturn(ofNullable(getCar()));
         Mockito.when(contractRepository.findContractsFromPeriodAndCarId(any(LocalDate.class), any(LocalDate.class), anyLong()))
                 .thenReturn(Collections.singletonList(getRentContract()));
@@ -152,5 +214,39 @@ public class ContractServiceImplTest {
         Mockito.doNothing().when(contractRepository).delete(any(Contract.class));
 
         contractService.deleteContract(EXISTED_CONTRACT_ID);
+    }
+
+    @Test
+    @DisplayName("Deleting a contract by logged-in user do not throw exception if a contract to delete is valid")
+    public void doNotThrowExceptionWhenDeleteContractIsByLoggedInUserAndIfContractToDeleteIsValid() throws Exception {
+        Mockito.when(securityService.getLoggedInUser()).thenReturn(getUser());
+        Mockito.when(contractRepository.findById(anyLong())).thenReturn(ofNullable(getRentContract()));
+        Mockito.doNothing().when(contractRepository).delete(any(Contract.class));
+
+        contractService.deleteContract(EXISTED_CONTRACT_ID);
+    }
+
+    @Test
+    @DisplayName("Deleting a contract by different logged-in user throw exception and a contract to delete is valid")
+    public void throwExceptionWhenDeleteContractIsByDifferentLoggedInUserAndContractToDeleteIsValid() throws Exception {
+        Mockito.when(securityService.getLoggedInUser()).thenReturn(getUserWithDifferentId());
+        Mockito.when(contractRepository.findById(anyLong())).thenReturn(ofNullable(getRentContract()));
+
+        assertThrows(ContractUnavailableException.class, () -> contractService.deleteContractForLoggedInUser(EXISTED_CONTRACT_ID));
+    }
+
+    @Test
+    @DisplayName("Deleting a contract by logged-in user throw exception if id is not exist")
+    public void throwExceptionIfContractToDeleteIsNotExisted() throws UserNotFoundException {
+        Mockito.when(securityService.getLoggedInUser()).thenReturn(getUser());
+        Mockito.when(contractRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(ContractNotFoundException.class, () -> contractService.deleteContractForLoggedInUser(EXISTED_CONTRACT_ID));
+    }
+
+    private User getUserWithDifferentId() {
+        User user = getUser();
+        user.setId(2L);
+        return user;
     }
 }

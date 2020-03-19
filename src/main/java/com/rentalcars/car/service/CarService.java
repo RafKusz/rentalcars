@@ -3,6 +3,7 @@ package com.rentalcars.car.service;
 import com.rentalcars.car.model.CarDto;
 import com.rentalcars.car.model.CarOutput;
 import com.rentalcars.exceptions.CarNotFoundException;
+import com.rentalcars.exceptions.UnavailableRangeOfDatesException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,9 +12,9 @@ public interface CarService {
 
     List<CarDto> getCars();
 
-    List<CarOutput> getAvailableCarsByRangeOfDates(LocalDate startDate, LocalDate finishDate);
+    List<CarOutput> getAvailableCarsByRangeOfDates(LocalDate startDate, LocalDate finishDate) throws UnavailableRangeOfDatesException;
 
-    CarDto getCar(Long id) throws CarNotFoundException;
+    CarOutput getCar(Long id) throws CarNotFoundException;
 
     CarDto createCar(CarDto carDto);
 

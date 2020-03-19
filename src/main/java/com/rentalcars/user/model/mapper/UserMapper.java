@@ -14,9 +14,6 @@ public interface UserMapper {
 
     UserMapper MAPPER = Mappers.getMapper(UserMapper.class);
 
-    @Mapping(source = "contractDtos", target = "contracts")
-    User mapToUser(UserDto userDto);
-
     @Mapping(source = "contracts", target = "contractDtos")
     UserDto mapToUserDto(User user);
 

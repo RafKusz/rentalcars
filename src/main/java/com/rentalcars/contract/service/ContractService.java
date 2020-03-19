@@ -15,9 +15,19 @@ public interface ContractService {
 
     List<ContractDto> getAllContractsByUser(Long userId) throws UserNotFoundException;
 
+    List<ContractDto> getAllContractsByLoggedInUser() throws UserNotFoundException;
+
+    List<ContractDto> getFutureContracts();
+
+    List<ContractDto> getFutureContractsByLoggedInUser() throws UserNotFoundException;
+
     ContractDto getContract(Long id) throws ContractNotFoundException;
 
-    ContractDto createContract(ContractInput contractInput) throws UserNotFoundException, CarNotFoundException, ContractUnavailableException;
+    ContractDto getMyContract(Long id) throws ContractNotFoundException, UserNotFoundException, ContractUnavailableException;
+
+    ContractDto createContract(ContractInput contractInput) throws ContractUnavailableException, UserNotFoundException, CarNotFoundException;
 
     void deleteContract(Long id) throws ContractNotFoundException;
+
+    void deleteContractForLoggedInUser(Long id) throws UserNotFoundException, ContractNotFoundException, ContractUnavailableException;
 }

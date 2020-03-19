@@ -11,7 +11,9 @@
             <column name="name">Jan</column>
             <column name="surname">Kowalski</column>
             <column name="email">kowalski@poczta.pl</column>
+            <column name="password">$2a$10$WcHmpXI.cdI84M3w.bf.8O34z8HKgYNSKaVBRFRIJjWToCjd/ZeDm</column>
             <column name="description">opis Kowalskiego</column>
+            <column name="role">USER</column>
             <column name="create_at" value="now()"/>
         </insert>
         <insert tableName="user_rental">
@@ -19,7 +21,9 @@
             <column name="name">Adam</column>
             <column name="surname">Nowak</column>
             <column name="email">nowak@poczta.pl</column>
+            <column name="password">$2a$10$WcHmpXI.cdI84M3w.bf.8O34z8HKgYNSKaVBRFRIJjWToCjd/ZeDm</column>
             <column name="description">opis Nowaka</column>
+            <column name="role">USER</column>
             <column name="create_at" value="now()"/>
         </insert>
     </changeSet>
@@ -49,8 +53,8 @@
             <column name="id">1</column>
             <column name="id_user">2</column>
             <column name="id_car">1</column>
-            <column name="date_of_rent" valueDate="2020-11-11"/>
-            <column name="date_of_return" valueDate="2020-12-11"/>
+            <column name="date_of_rent" valueDate="2090-11-11"/>
+            <column name="date_of_return" valueDate="2090-12-11"/>
             <column name="create_at" value="now()"/>
         </insert>
     </changeSet>

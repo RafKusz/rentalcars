@@ -21,6 +21,8 @@ public interface CarMapper {
     @Mapping(source = "contracts", target = "contractDtos")
     CarDto mapToDto(Car car);
 
+    CarOutput mapToCarOutput(Car car);
+
     List<CarOutput> mapToCarOutputs(List<Car> cars);
 
     List<CarDto> mapToCarDtos(List<Car> cars);

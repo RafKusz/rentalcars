@@ -5,15 +5,14 @@ import com.rentalcars.car.model.CarDto;
 import com.rentalcars.car.model.CarOutput;
 import com.rentalcars.car.repository.CarRepository;
 import com.rentalcars.exceptions.CarNotFoundException;
+import com.rentalcars.exceptions.UnavailableRangeOfDatesException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -27,8 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
-@SpringBootTest
-@Transactional
 @ExtendWith(SpringExtension.class)
 public class CarServiceImplTest {
 
@@ -47,10 +44,10 @@ public class CarServiceImplTest {
     public void returnCarIfIdExisted() throws Exception {
         Mockito.when(carRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getCar()));
 
-        CarDto carDto = carService.getCar(EXISTED_CAR_ID);
+        CarOutput carOutput = carService.getCar(EXISTED_CAR_ID);
 
-        assertNotNull(carDto);
-        assertEquals(EXISTED_CAR_ID, carDto.getId());
+        assertNotNull(carOutput);
+        assertEquals(EXISTED_CAR_ID, carOutput.getId());
     }
 
     @Test
@@ -74,13 +71,19 @@ public class CarServiceImplTest {
 
     @Test
     @DisplayName("Getting all available cars in not occupied range of dates return list of cars")
-    public void returnListOfAvailableCarsIfRangeOfDatesIsNotOccupied() {
+    public void returnListOfAvailableCarsIfRangeOfDatesIsNotOccupied() throws UnavailableRangeOfDatesException {
         Mockito.when(carRepository.findAvailableCarsByDate(any(LocalDate.class), any(LocalDate.class))).thenReturn(Collections.singletonList(getCar()));
 
         List<CarOutput> carOutputList = carService.getAvailableCarsByRangeOfDates(DATE_OF_RENT, DATE_OF_RETURN);
 
         assertNotNull(carOutputList);
         assertEquals(1, carOutputList.size());
+    }
+
+    @Test
+    @DisplayName("Getting all available cars throw exception if start date is after than finish date")
+    public void throwExceptionIfStartDateIsAfterThanFinishDate() {
+        assertThrows(UnavailableRangeOfDatesException.class, () -> carService.getAvailableCarsByRangeOfDates(DATE_OF_RETURN, DATE_OF_RENT));
     }
 
     @Test
@@ -101,7 +104,7 @@ public class CarServiceImplTest {
         assertEquals(DESCRIPTION, carDto.getDescription());
     }
 
-    private Car getCarFromMock(Car car) {
+    private Object getCarFromMock(Car car) {
         car.setId(1L);
         return car;
     }
